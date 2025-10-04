@@ -1,9 +1,6 @@
 name: Main
 
-on:
-  release:
-    types:
-      - published
+on: push
 
 defaults:
   run:
@@ -33,21 +30,13 @@ jobs:
         with:
           path: build
           key: windows-${{ matrix.arch }}-cmake-v1
-
+     
       - name: Configure
         run: |
-          cmake \
-            -B build \
-            -G "Visual Studio 17 2022" \
-            -A ${{ matrix.generator-platform }} \
-            # EOL
+          cmake -B build -G "Visual Studio 17 2022" -A ${{ matrix.generator-platform }}
 
       - name: Build
-        run: |
-          cmake \
-            --build build \
-            --config RelWithDebInfo \
-            # EOL
+        run: cmake --build build --config RelWithDebInfo
 
       - name: Upload
         run: |
