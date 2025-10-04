@@ -42,7 +42,5 @@ jobs:
         run: |
           cd build/RelWithDebInfo
           7z a fallout-ce-windows-${{ matrix.arch }}.zip fallout-ce.exe
-          gh release upload ${{ github.event.release.tag_name }} fallout-ce-windows-${{ matrix.arch }}.zip
-          rm fallout-ce-windows-${{ matrix.arch }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
