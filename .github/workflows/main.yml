@@ -1,0 +1,59 @@
+name: Main
+
+on:
+  release:
+    types:
+      - published
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  windows:
+    name: Windows (${{ matrix.arch }})
+
+    runs-on: windows-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86
+            generator-platform: Win32
+          - arch: x64
+            generator-platform: x64
+
+    steps:
+      - name: Clone
+        uses: actions/checkout@v5
+
+      - name: Cache cmake build
+        uses: actions/cache@v4
+        with:
+          path: build
+          key: windows-${{ matrix.arch }}-cmake-v1
+
+      - name: Configure
+        run: |
+          cmake \
+            -B build \
+            -G "Visual Studio 17 2022" \
+            -A ${{ matrix.generator-platform }} \
+            # EOL
+
+      - name: Build
+        run: |
+          cmake \
+            --build build \
+            --config RelWithDebInfo \
+            # EOL
+
+      - name: Upload
+        run: |
+          cd build/RelWithDebInfo
+          7z a fallout-ce-windows-${{ matrix.arch }}.zip fallout-ce.exe
+          gh release upload ${{ github.event.release.tag_name }} fallout-ce-windows-${{ matrix.arch }}.zip
+          rm fallout-ce-windows-${{ matrix.arch }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
